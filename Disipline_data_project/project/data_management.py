@@ -35,21 +35,25 @@ def add_info(date, categories, activities):
 
         connection.commit()
         print('added')
+        return cursor.lastrowid
     except:
         print("no name find")
+        return None
 
 
 def add_category(category):
     try:
         cursor.execute(
             "INSERT INTO categories (category_name) VALUES (?)",
-            (category)
+            (category,)
         )
 
         connection.commit()
         print('added')
+        return cursor.lastrowid
     except:
         print("no name find")
+        return None
         
 # delete all the data in the table
 def reset_table(table):

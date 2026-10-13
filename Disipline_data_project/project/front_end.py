@@ -247,6 +247,9 @@ def create_gui():
 
         category_id = add_category(category_name)
 
+        if category_id is None:
+            return
+
         create_category_row(
             category_id,
             category_name
