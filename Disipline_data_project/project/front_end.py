@@ -8,12 +8,14 @@ from datetime import date
 from data_management import (
     create_table,
     add_category,
-    add_info,
     get_data_storage,
     close_database,
-    reset_table
+    reset_table,
 )
 
+from category_ui import (
+    create_category_row
+)
 
 def create_gui():
 
@@ -26,12 +28,12 @@ def create_gui():
     create_table()
 
     # ------------------------------------------------
-    # Date
+    # Current Date
     # ------------------------------------------------
 
     tk.Label(
         root,
-        text="Date:"
+        text="Current Date:"
     ).grid(
         row=0,
         column=0,
@@ -69,144 +71,7 @@ def create_gui():
     # Store GUI information about categories
     category_widgets = {}
 
-    # ------------------------------------------------
-    # Get activities belonging to category
-    # ------------------------------------------------
-
-    def get_category_activities(category_id):
-
-        activities = get_data_storage("activities")
-
-        if not activities:
-            return None
-
-        result = []
-
-        for activity in activities:
-
-            # activity:
-            # (id, date, category_id, activity_name)
-
-            if activity[2] == category_id:
-
-                activity_name = activity[3]
-
-                if activity_name not in result:
-                    result.append(activity_name)
-
-        return result
-
-    # ------------------------------------------------
-    # Create category row
-    # ------------------------------------------------
-
-    def create_category_row(category_id, category_name):
-
-        row = len(category_widgets)
-
-        checked = tk.BooleanVar(value=False)
-
-        selected_activity = tk.StringVar()
-
-        activities = get_category_activities(category_id)
-
-        # -----------------------
-        # Checkbox
-        # -----------------------
-
-        checkbox = tk.Checkbutton(
-            category_frame,
-            text=category_name,
-            variable=checked
-        )
-
-        checkbox.grid(
-            row=row,
-            column=0,
-            sticky="w",
-            padx=5,
-            pady=5
-        )
-
-        # -----------------------
-        # Dropdown
-        # -----------------------
-
-        dropdown = ttk.Combobox(
-            category_frame,
-            textvariable=selected_activity,
-            values=activities,
-            state="readonly",
-            width=25
-        )
-
-        dropdown.grid(
-            row=row,
-            column=1,
-            padx=5
-        )
-
-        # Select first activity automatically
-        if activities:
-            selected_activity.set(activities[0])
-
-        # -----------------------
-        # Add activity function
-        # -----------------------
-
-        def add_new_activity():
-
-            activity_name = simpledialog.askstring(
-                "New Activity",
-                f"Add an activity to {category_name}:"
-            )
-
-            if not activity_name:
-                return
-
-            current_date = date_entry.get()
-
-            add_info(
-                current_date,
-                category_id,
-                activity_name
-            )
-
-            # Reload activities from database
-            new_activities = get_category_activities(category_id)
-
-            dropdown["values"] = new_activities
-
-            selected_activity.set(activity_name)
-
-        # -----------------------
-        # Add activity button
-        # -----------------------
-
-        add_activity_button = tk.Button(
-            category_frame,
-            text="+ Activity",
-            command=add_new_activity
-        )
-
-        add_activity_button.grid(
-            row=row,
-            column=2,
-            padx=5
-        )
-
-        # Store everything for this category
-        category_widgets[category_id] = {
-
-            "name": category_name,
-
-            "checked": checked,
-
-            "selected_activity": selected_activity,
-
-            "dropdown": dropdown
-        }
-
+    
     # ------------------------------------------------
     # Load categories from database
     # ------------------------------------------------
@@ -221,14 +86,20 @@ def create_gui():
 
         categories = get_data_storage("categories")
 
+        if not categories:
+            print("No categoty to show")
+            return
         for category in categories:
-
             category_id = category[0]
             category_name = category[1]
 
             create_category_row(
                 category_id,
-                category_name
+                category_name,
+                category_widgets,
+                category_frame,
+                date_entry,
+                load_categories
             )
 
     # ------------------------------------------------
@@ -252,7 +123,11 @@ def create_gui():
 
         create_category_row(
             category_id,
-            category_name
+            category_name,
+            category_widgets,
+            category_frame,
+            date_entry,
+            load_categories
         )
 
     # ------------------------------------------------
@@ -279,6 +154,8 @@ def create_gui():
     def delete_all():
         reset_table("categories")
         reset_table("activities")
+
+    
     # ------------------------------------------------
     # Buttons
     # ------------------------------------------------

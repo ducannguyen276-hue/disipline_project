@@ -62,7 +62,42 @@ def reset_table(table):
         """)
     connection.commit()
     print('deleted')
- 
+
+
+def delete_activities(category_id, activity_name):
+    cursor.execute(
+        """
+        DELETE FROM activities
+        WHERE category_id = ?
+        AND activity_name = ?
+        """,
+        (category_id, activity_name)
+    )
+
+    connection.commit()
+
+    print(f"Deleted {activity_name}")
+
+def delete_category(category_id):
+    cursor.execute(
+        """
+        DELETE FROM activities
+        WHERE category_id = ?
+        """,
+        (category_id,)
+    )
+
+    cursor.execute(
+        """
+        DELETE FROM categories
+        WHERE id = ?
+        """,
+        (category_id,)
+        )
+
+    connection.commit()
+
+    print(f"Deleted {category_id}")
 # print all the data_storage info in the database
 def get_data_storage(table):
     try:
