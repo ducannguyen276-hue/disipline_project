@@ -28,12 +28,12 @@ def create_gui():
     create_table()
 
     # ------------------------------------------------
-    # Current Date
+    # Date
     # ------------------------------------------------
 
     tk.Label(
         root,
-        text="Current Date:"
+        text="Date:"
     ).grid(
         row=0,
         column=0,
@@ -53,7 +53,7 @@ def create_gui():
         0,
         date.today().isoformat()
     )
-
+    
     # ------------------------------------------------
     # Category area
     # ------------------------------------------------
@@ -149,11 +149,15 @@ def create_gui():
     def print_data():
         print("categories: ",get_data_storage("categories"))
         print("activities: ",get_data_storage("activities"))
+        print("activity logs: ",get_data_storage("activities_log"))
 
 
     def delete_all():
-        reset_table("categories")
+        reset_table("activities_log")
         reset_table("activities")
+        reset_table("categories")
+        create_table()
+        load_categories()
 
     
     # ------------------------------------------------

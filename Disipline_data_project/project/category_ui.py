@@ -4,7 +4,8 @@ from tkinter import ttk
 from tkinter import simpledialog
 
 from data_management import (
-    add_info,
+    add_activity,
+    add_activity_log,
     get_data_storage,
     delete_activities,
     delete_category
@@ -20,21 +21,13 @@ def get_category_activities(category_id):
     activities = get_data_storage("activities")
 
     if not activities:
-        return None
+        return []
 
     result = []
 
     for activity in activities:
-
-        # activity:
-        # (id, date, category_id, activity_name)
-
-        if activity[2] == category_id:
-
-            activity_name = activity[3]
-
-            if activity_name not in result:
-                result.append(activity_name)
+        result.append(activity)
+        
 
     return result
 
@@ -44,7 +37,7 @@ def get_category_activities(category_id):
 
 def create_category_row(category_id, category_name,
                         category_widgets, category_frame,
-                        date, load_categories):
+                        date_entry, load_categories):
 
     row = len(category_widgets)
 
@@ -53,6 +46,7 @@ def create_category_row(category_id, category_name,
     selected_activity = tk.StringVar()
 
     activities = get_category_activities(category_id)
+    activity_names = [activity[2] for activity in activities]
 
     # -----------------------
     # Checkbox
@@ -79,7 +73,7 @@ def create_category_row(category_id, category_name,
     dropdown = ttk.Combobox(
         category_frame,
         textvariable=selected_activity,
-        values=activities,
+        values=activity_names,
         state="readonly",
         width=25
     )
@@ -91,8 +85,8 @@ def create_category_row(category_id, category_name,
     )
 
     # Select first activity automatically
-    if activities:
-        selected_activity.set(activities[0])
+    if activity_names:
+        selected_activity.set(activity_names[0])
 
     # -----------------------
     # Add activity function
@@ -108,18 +102,25 @@ def create_category_row(category_id, category_name,
         if not activity_name:
             return
 
-        current_date = date.get()
-
-        add_info(
-            current_date,
-            category_id,
-            activity_name
+        existing_activity = next(
+            (
+                activity
+                for activity in get_category_activities(category_id)
+                if activity[2] == activity_name
+            ),
+            None
         )
+        activity_id = (
+            existing_activity[0]
+            if existing_activity
+            else add_activity(category_id, activity_name)
+        )
+        add_activity_log(date_entry.get(), activity_id)
 
         # Reload activities from database
         new_activities = get_category_activities(category_id)
 
-        dropdown["values"] = new_activities
+        dropdown["values"] = [activity[2] for activity in new_activities]
 
         selected_activity.set(activity_name)
 
@@ -138,10 +139,11 @@ def create_category_row(category_id, category_name,
         # Refresh dropdown after deleting
         new_activities = get_category_activities(category_id)
 
-        dropdown["values"] = new_activities
+        activity_names = [activity[2] for activity in new_activities]
+        dropdown["values"] = activity_names
 
-        if new_activities:
-            selected_activity.set(new_activities[0])
+        if activity_names:
+            selected_activity.set(activity_names[0])
         else:
             selected_activity.set("")
 

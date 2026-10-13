@@ -16,30 +16,44 @@ def create_table():
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS activities (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT,
                 category_id INTEGER,
-                activity_name TEXT NOT NULL,
-                FOREIGN KEY (category_id) REFERENCES categories(id)
+                activity_name TEXT NOT NULL
+            )
+        """)
+
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS activities_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT,
+                activity_id INTEGER,
+                FOREIGN KEY (activity_id) REFERENCES activities(id)
             )
         """)
     connection.commit()
-    print('create table')
+    print('create tables')
 
-# save first/last name to database
-def add_info(date, categories, activities):
-    try:
-        cursor.execute(
-            "INSERT INTO activities (date, category_id, activity_name) VALUES (?, ?, ?)",
-            (date, categories, activities)
-        )
+def add_activity(category_id, activity_name):
+    cursor.execute(
+        """
+        INSERT INTO activities (category_id, activity_name)
+        VALUES (?, ?)
+        """,
+        (category_id, activity_name)
+    )
+    connection.commit()
+    return cursor.lastrowid
 
-        connection.commit()
-        print('added')
-        return cursor.lastrowid
-    except:
-        print("no name find")
-        return None
 
+def add_activity_log(date, activity_id):
+    cursor.execute(
+        """
+        INSERT INTO activities_log (date, activity_id)
+        VALUES (?, ?)
+        """,
+        (date, activity_id)
+    )
+    connection.commit()
+    return cursor.lastrowid
 
 def add_category(category):
     try:
