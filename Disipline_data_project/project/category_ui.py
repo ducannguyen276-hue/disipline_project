@@ -5,7 +5,6 @@ from tkinter import simpledialog
 
 from data_management import (
     add_activity,
-    add_activity_log,
     get_data_storage,
     delete_activities,
     delete_category
@@ -26,8 +25,10 @@ def get_category_activities(category_id):
     result = []
 
     for activity in activities:
-        result.append(activity)
-        
+        if len(activity) == 3 and activity[1] == category_id:
+            result.append(activity)
+        elif len(activity) == 4 and activity[2] == category_id:
+            result.append((activity[0], activity[2], activity[3]))
 
     return result
 
@@ -115,7 +116,7 @@ def create_category_row(category_id, category_name,
             if existing_activity
             else add_activity(category_id, activity_name)
         )
-        add_activity_log(date_entry.get(), activity_id)
+
 
         # Reload activities from database
         new_activities = get_category_activities(category_id)

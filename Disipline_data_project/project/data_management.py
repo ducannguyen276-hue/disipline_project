@@ -43,6 +43,24 @@ def add_activity(category_id, activity_name):
     connection.commit()
     return cursor.lastrowid
 
+# get actitvity id
+def get_activity_id(category_id, activity_name):
+    cursor.execute(
+        """
+        SELECT id
+        FROM activities
+        WHERE category_id = ?
+        AND activity_name = ?
+        """,
+        (category_id, activity_name)
+    )
+
+    result = cursor.fetchone()
+
+    if result is None:
+        return None
+
+    return result[0]
 
 def add_activity_log(date, activity_id):
     cursor.execute(
@@ -112,6 +130,7 @@ def delete_category(category_id):
     connection.commit()
 
     print(f"Deleted {category_id}")
+
 # print all the data_storage info in the database
 def get_data_storage(table):
     try:

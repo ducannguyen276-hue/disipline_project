@@ -11,6 +11,8 @@ from data_management import (
     get_data_storage,
     close_database,
     reset_table,
+    add_activity_log,
+    get_activity_id
 )
 
 from category_ui import (
@@ -135,16 +137,54 @@ def create_gui():
     # ------------------------------------------------
 
     def show_selected():
-
+        selected_date = date_entry.get()
         for category_id, info in category_widgets.items():
-
             if info["checked"].get():
 
                 print(
                     info["name"],
                     ":",
-                    info["selected_activity"].get()
+                    info["selected_activity"].get(),
+                    ":",
+                    selected_date
+
                 )
+    # ------------------------------------------------
+    # Save selected categories
+    # ------------------------------------------------
+
+    def save_selected():
+       selected_date = date_entry.get()
+       for category_id, info in category_widgets.items():
+            if info["checked"].get():
+                activity_name = info["selected_activity"].get()
+
+                activity_id = get_activity_id(
+                    category_id,
+                    activity_name
+                )
+
+                # create debug
+                if activity_id is None:
+                    print("Not founded ID")
+
+                add_activity_log(selected_date,activity_id)
+
+                print("saved",
+                      selected_date,
+                      activity_name,
+                      "as",
+                      activity_id)
+
+                
+                
+
+    # ------------------------------------------------
+    # Print datas
+    # ------------------------------------------------
+
+    def print_daily_log():
+        print("dailylog",get_data_storage("activities_log"))
 
     def print_data():
         print("categories: ",get_data_storage("categories"))
@@ -176,15 +216,26 @@ def create_gui():
         pady=10
     )
 
-    save_button = tk.Button(
+    show_button = tk.Button(
         root,
         text="Show Selected",
         command=show_selected
     )
 
-    save_button.grid(
+    show_button.grid(
         row=2,
         column=1
+    )
+
+    save_button = tk.Button(
+            root,
+            text="Save Selected",
+            command=save_selected
+        )
+    
+    save_button.grid(
+        row=2,
+        column=2
     )
 
     information_button = tk.Button(
@@ -208,6 +259,18 @@ def create_gui():
     delete_button.grid(
             row = 3,
             column = 2,
+            pady = 10
+        )
+
+    daily_log_button = tk.Button(
+                        root,
+                        text="Print All Log",
+                        command=print_daily_log
+                    )
+    
+    daily_log_button.grid(
+            row = 3,
+            column = 3,
             pady = 10
         )
 
