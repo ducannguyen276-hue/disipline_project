@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/35189640/README.md)
+
 # Student Life Balance
 
 A Python desktop application for recording daily activities across different areas of student life. Create categories and activities, log what you did on a date, view your history, and export it as a CSV file for Excel.
