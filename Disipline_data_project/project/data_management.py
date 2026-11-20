@@ -43,6 +43,13 @@ def add_activity(category_id, activity_name):
     connection.commit()
     return cursor.lastrowid
 
+
+# ------------------------------------------------
+# Daily log functions
+# ------------------------------------------------
+
+
+
 # get actitvity id
 def get_activity_id(category_id, activity_name):
     cursor.execute(
@@ -62,6 +69,8 @@ def get_activity_id(category_id, activity_name):
 
     return result[0]
 
+
+# add new activities log to the table
 def add_activity_log(date, activity_id):
     cursor.execute(
         """
@@ -72,6 +81,24 @@ def add_activity_log(date, activity_id):
     )
     connection.commit()
     return cursor.lastrowid
+
+def get_daily_log():
+    cursor.execute(
+            """
+            SELECT
+                activities_log.date,
+                categories.category_name,
+                activities.activity_name
+            FROM activities_log
+            JOIN activities
+                ON activities_log.activity_id = activities.id
+            JOIN categories
+                ON activities.category_id = categories.id;
+            """
+    )
+
+    return cursor.fetchall()
+
 
 def add_category(category):
     try:

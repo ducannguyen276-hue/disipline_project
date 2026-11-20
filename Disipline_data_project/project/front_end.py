@@ -15,6 +15,11 @@ from data_management import (
     get_activity_id
 )
 
+from daily_log import(
+    show_activities_histories,
+    export_activity_history
+)
+
 from category_ui import (
     create_category_row
 )
@@ -183,8 +188,9 @@ def create_gui():
     # Print datas
     # ------------------------------------------------
 
-    def print_daily_log():
-        print("dailylog",get_data_storage("activities_log"))
+    def show_daily_log():
+        print("dailylog")
+        show_activities_histories()
 
     def print_data():
         print("categories: ",get_data_storage("categories"))
@@ -264,8 +270,8 @@ def create_gui():
 
     daily_log_button = tk.Button(
                         root,
-                        text="Print All Log",
-                        command=print_daily_log
+                        text="Show All Log",
+                        command=show_daily_log
                     )
     
     daily_log_button.grid(
@@ -273,6 +279,20 @@ def create_gui():
             column = 3,
             pady = 10
         )
+
+
+
+    export_button = tk.Button(
+            root,
+            text="Export Csv",
+            command=export_activity_history
+        )
+        
+    export_button.grid(
+            row = 4,
+            column = 1,
+            pady = 5
+            )
 
     # ------------------------------------------------
     # Load saved categories
